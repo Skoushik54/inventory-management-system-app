@@ -1,0 +1,84 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------< com.secureinventory:inventory-system >----------------
+[INFO] Building inventory-system 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.4.2:run (default-cli) > test-compile @ inventory-system >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ inventory-system ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ inventory-system ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 28 source files with javac [debug parameters release 17] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] /C:/Users/samba/Downloads/inventory-management-system-main/inventory-management-system-main/backend/src/main/java/com/secureinventory/system/config/SecurityConfig.java: C:\Users\samba\Downloads\inventory-management-system-main\inventory-management-system-main\backend\src\main\java\com\secureinventory\system\config\SecurityConfig.java uses or overrides a deprecated API.
+[INFO] /C:/Users/samba/Downloads/inventory-management-system-main/inventory-management-system-main/backend/src/main/java/com/secureinventory/system/config/SecurityConfig.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ inventory-system ---
+[INFO] skip non existing resourceDirectory C:\Users\samba\Downloads\inventory-management-system-main\inventory-management-system-main\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ inventory-system ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.4.2:run (default-cli) < test-compile @ inventory-system <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.4.2:run (default-cli) @ inventory-system ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.2)
+
+2026-02-26T23:02:03.962+05:30  INFO 15992 --- [           main] c.s.system.SecureInventoryApplication    : Starting SecureInventoryApplication using Java 21 with PID 15992 (C:\Users\samba\Downloads\inventory-management-system-main\inventory-management-system-main\backend\target\classes started by samba in C:\Users\samba\Downloads\inventory-management-system-main\inventory-management-system-main\backend)
+2026-02-26T23:02:03.962+05:30  INFO 15992 --- [           main] c.s.system.SecureInventoryApplication    : The following 1 profile is active: "dev"
+2026-02-26T23:02:04.690+05:30  INFO 15992 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-26T23:02:04.761+05:30  INFO 15992 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 66 ms. Found 5 JPA repository interfaces.
+2026-02-26T23:02:08.542+05:30  INFO 15992 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-26T23:02:08.584+05:30  INFO 15992 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-26T23:02:08.584+05:30  INFO 15992 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-02-26T23:02:08.757+05:30  INFO 15992 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-26T23:02:08.757+05:30  INFO 15992 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4732 ms
+2026-02-26T23:02:08.902+05:30  INFO 15992 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-26T23:02:08.996+05:30  INFO 15992 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2026-02-26T23:02:09.978+05:30  INFO 15992 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-26T23:02:10.332+05:30  INFO 15992 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-26T23:02:10.364+05:30  INFO 15992 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-26T23:02:10.664+05:30  INFO 15992 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2026-02-26T23:02:10.666+05:30  INFO 15992 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-26T23:02:10.691+05:30  WARN 15992 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-26T23:02:10.721+05:30  INFO 15992 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-26T23:02:11.940+05:30  INFO 15992 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-26T23:02:12.068+05:30  INFO 15992 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-26T23:02:13.037+05:30  INFO 15992 --- [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-02-26T23:02:13.218+05:30  WARN 15992 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-26T23:02:13.612+05:30  INFO 15992 --- [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+2026-02-26T23:02:13.742+05:30  INFO 15992 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-26T23:02:13.750+05:30  INFO 15992 --- [           main] c.s.system.SecureInventoryApplication    : Started SecureInventoryApplication in 10.243 seconds (process running for 10.608)
+>>> CLOUD ADMIN RESET: admin / password123
+2026-02-26T23:02:51.380+05:30  INFO 15992 --- [nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-26T23:02:51.382+05:30  INFO 15992 --- [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-26T23:02:51.383+05:30  INFO 15992 --- [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+^C

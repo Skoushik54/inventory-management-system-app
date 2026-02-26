@@ -1,0 +1,15 @@
+[Unit]
+Description=Secure Inventory Management System
+After=syslog.target network.target postgresql.service
+
+[Service]
+User=inventory-user
+Group=inventory-user
+Type=simple
+WorkingDirectory=/opt/inventory/backend
+ExecStart=/usr/bin/java -jar inventory-system.jar
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
