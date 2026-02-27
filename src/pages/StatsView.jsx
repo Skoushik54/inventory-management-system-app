@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { BASE_URL } from '../services/api';
-import { Package, RefreshCw, AlertTriangle, FileSpreadsheet, Clock } from 'lucide-react';
+import { Package, RefreshCw, AlertTriangle, FileSpreadsheet, Clock, Trash2, AlertCircle } from 'lucide-react';
 
 const StatsView = () => {
     const navigate = useNavigate();
@@ -11,6 +11,7 @@ const StatsView = () => {
         pendingReturns: 0
     });
     const [history, setHistory] = useState([]);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     useEffect(() => {
         fetchStats();
@@ -123,6 +124,18 @@ const StatsView = () => {
         }
     };
 
+    const handleClearHistory = async () => {
+        try {
+            await api.delete('/transactions/clear-all');
+            fetchStats();
+            showAlert('Success', 'Transaction history has been cleared permanently.');
+            setShowConfirm(false);
+        } catch (err) {
+            showAlert('Error', 'Failed to clear history: ' + (err.response?.data?.error || err.message), 'error');
+            setShowConfirm(false);
+        }
+    };
+
     return (
         <div className="dashboard-container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -157,10 +170,60 @@ const StatsView = () => {
             </div>
 
             <div className="card" style={{ padding: '0' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Clock size={20} color="var(--accent)" />
-                    <h3 style={{ margin: 0 }}>Recent Activity History</h3>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Clock size={20} color="var(--accent)" />
+                        <h3 style={{ margin: 0 }}>Recent Activity History</h3>
+                    </div>
+                    <button
+                        onClick={() => setShowConfirm(true)}
+                        style={{
+                            padding: '0.4rem 0.8rem',
+                            background: 'none',
+                            border: '1px solid var(--danger)',
+                            color: 'var(--danger)',
+                            borderRadius: '0.4rem',
+                            fontSize: '0.8rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = '#fef2f2'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.background = 'none'; }}
+                    >
+                        <Trash2 size={14} /> Clear All History
+                    </button>
                 </div>
+
+                {/* CONFIRMATION MODAL */}
+                {showConfirm && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                    }}>
+                        <div className="card" style={{ maxWidth: '400px', width: '90%', textAlign: 'center', padding: '2rem' }}>
+                            <div style={{ color: 'var(--danger)', marginBottom: '1rem' }}>
+                                <AlertCircle size={48} />
+                            </div>
+                            <h3>Clear Entire History?</h3>
+                            <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
+                                This will permanently delete all transaction logs. This action cannot be undone.
+                                <strong> Your inventory stock counts will not be changed.</strong>
+                            </p>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button className="btn" style={{ flex: 1, backgroundColor: '#64748b' }} onClick={() => setShowConfirm(false)}>
+                                    Cancel
+                                </button>
+                                <button className="btn" style={{ flex: 1, backgroundColor: 'var(--danger)' }} onClick={handleClearHistory}>
+                                    Yes, Clear All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead style={{ background: '#f8fafc' }}>

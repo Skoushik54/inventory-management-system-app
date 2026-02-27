@@ -400,26 +400,7 @@ const TransactionView = () => {
             <div className="card" style={{ marginTop: '2rem', padding: 0, overflow: 'hidden' }}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3 style={{ margin: 0 }}>Active Issue Ledger</h3>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                        <button
-                            onClick={handleClearHistory}
-                            style={{
-                                padding: '0.4rem 0.8rem',
-                                background: 'none',
-                                border: '1px solid var(--danger)',
-                                color: 'var(--danger)',
-                                borderRadius: '0.4rem',
-                                fontSize: '0.8rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.4rem'
-                            }}
-                        >
-                            <Trash2 size={14} /> Clear History
-                        </button>
-                        <span className="badge badge-warning">{pending.length} Outstanding Items</span>
-                    </div>
+                    <span className="badge badge-warning">{pending.length} Outstanding Items</span>
                 </div>
                 <div className="table-container">
                     <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
