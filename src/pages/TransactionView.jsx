@@ -22,6 +22,8 @@ const TransactionView = () => {
     // Custom Popup State
     const [confirmPopup, setConfirmPopup] = useState({ show: false, title: '', message: '', onConfirm: null, type: 'info' });
     const [alertPopup, setAlertPopup] = useState({ show: false, title: '', message: '', type: 'success' });
+    const [showPrintPreview, setShowPrintPreview] = useState(false);
+    const [issuedSummary, setIssuedSummary] = useState([]);
 
     useEffect(() => {
         fetchPending();
@@ -146,14 +148,10 @@ const TransactionView = () => {
                             purpose: purpose
                         });
                     }
-                    showAlert('Success', 'Stock issued and logged');
-                    handlePrint();
+                    // Capture snapshot for preview before clearing cart
+                    setIssuedSummary([...cart]);
+                    setShowPrintPreview(true);
                     setCart([]);
-                    setOfficerData({ badgeNumber: '', name: '', department: '', phone: '', others: '' });
-                    setPurpose('');
-                    localStorage.removeItem('trans_officer');
-                    localStorage.removeItem('trans_purpose');
-                    fetchPending();
                     setConfirmPopup(prev => ({ ...prev, show: false }));
                 } catch (err) {
                     showAlert('Denied', err.response?.data?.message || 'Stock allocation failed', 'error');
@@ -183,24 +181,34 @@ const TransactionView = () => {
 
 
     const handlePrint = () => {
-        const printContent = document.getElementById('print-receipt').innerHTML;
-        const originalContent = document.body.innerHTML;
-        document.body.innerHTML = printContent;
+        const previewElement = document.getElementById('receipt-visual-container');
+        if (!previewElement) return;
 
-        // Use native Electron printing for better support
-        if (window.electronAPI && window.electronAPI.printReceipt) {
-            window.electronAPI.printReceipt();
-            // Revert UI after a small delay to allow print capture
-            setTimeout(() => {
-                document.body.innerHTML = originalContent;
-                window.location.reload();
-            }, 1000);
-        } else {
-            window.print();
-            document.body.innerHTML = originalContent;
+        const printContent = previewElement.innerHTML;
+        const originalContent = document.body.innerHTML;
+
+        // Temporarily swap body content with the receipt design
+        document.body.innerHTML = printContent;
+        window.print();
+
+        // Restore the app UI
+        document.body.innerHTML = originalContent;
+
+        // Delay reload to let UI recover
+        setTimeout(() => {
+            closeAfterPrint();
             window.location.reload();
-        }
+        }, 500);
     };
+
+    const closeAfterPrint = () => {
+        setShowPrintPreview(false);
+        setOfficerData({ badgeNumber: '', name: '', department: '', phone: '', others: '' });
+        setPurpose('');
+        localStorage.removeItem('trans_officer');
+        localStorage.removeItem('trans_purpose');
+        fetchPending();
+    }
 
     const [returnQty, setReturnQty] = useState(1);
     const [returningTransaction, setReturningTransaction] = useState(null);
@@ -472,56 +480,6 @@ const TransactionView = () => {
                 </div>
             )}
 
-            {/* Hidden Print Receipt Template */}
-            <div id="print-receipt" style={{ display: 'none' }}>
-                <div style={{ padding: '40px', fontFamily: 'serif', maxWidth: '800px', margin: 'auto', border: '2px solid #333' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '30px', borderBottom: '2px solid #333', paddingBottom: '10px' }}>
-                        <h1 style={{ margin: 0, textTransform: 'uppercase' }}>Greyhounds Telangana</h1>
-                        <h2 style={{ margin: '5px 0' }}>Workshop Inventory Management System</h2>
-                        <h3 style={{ margin: 0 }}>ISSUE REGISTER SLIP</h3>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                        <div>
-                            <p><strong>Officer ID No:</strong> {officerData.badgeNumber}</p>
-                            <p><strong>Name:</strong> {officerData.name}</p>
-                            <p><strong>Unit:</strong> {officerData.department}</p>
-                            <p><strong>Date/Time:</strong> {new Date().toLocaleString()}</p>
-                        </div>
-                        <div>
-                            <p><strong>Purpose:</strong> {purpose || 'General Issue'}</p>
-                        </div>
-                    </div>
-
-                    <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #333' }}>
-                        <thead>
-                            <tr style={{ backgroundColor: '#eee' }}>
-                                <th style={{ border: '1px solid #333', padding: '10px', textAlign: 'left' }}>Item Description</th>
-                                <th style={{ border: '1px solid #333', padding: '10px', textAlign: 'center' }}>Quantity</th>
-                                <th style={{ border: '1px solid #333', padding: '10px', textAlign: 'left' }}>QR Code Ref</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {cart.map((item, idx) => (
-                                <tr key={idx}>
-                                    <td style={{ border: '1px solid #333', padding: '10px' }}>{item.name}</td>
-                                    <td style={{ border: '1px solid #333', padding: '10px', textAlign: 'center' }}>{item.quantity}</td>
-                                    <td style={{ border: '1px solid #333', padding: '10px' }}>{item.barcode}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <div style={{ marginTop: '50px', display: 'flex', justifyContent: 'space-between' }}>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ borderTop: '1px solid #333', width: '200px', marginTop: '40px' }}></div>
-                            <p>Officer Signature</p>
-                        </div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ borderTop: '1px solid #333', width: '200px', marginTop: '40px' }}></div>
-                            <p>Workshop In-charge</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
             {/* PARTIAL RETURN MODAL */}
             {returningTransaction && (
                 <div className="modal-overlay" style={{ zIndex: 3001 }}>
@@ -554,6 +512,79 @@ const TransactionView = () => {
                         <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
                             <button className="btn" style={{ background: '#f1f5f9', color: '#475569' }} onClick={() => setReturningTransaction(null)}>Cancel</button>
                             <button className="btn" onClick={confirmReturn}>Confirm Return</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* NEW PRINT PREVIEW MODAL */}
+            {showPrintPreview && (
+                <div className="modal-overlay" style={{ zIndex: 4000 }}>
+                    <div className="card" style={{ maxWidth: '850px', width: '95%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', position: 'relative' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '2px solid var(--border)', paddingBottom: '1rem' }}>
+                            <h3 style={{ margin: 0 }}>Verify Issue Slip (Print Preview)</h3>
+                            <button onClick={() => setShowPrintPreview(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={24} /></button>
+                        </div>
+
+                        {/* THE ACTUAL RECEIPT VISUAL */}
+                        <div id="receipt-visual-container" style={{
+                            background: 'white',
+                            padding: '30px',
+                            color: 'black',
+                            border: '1px solid #ccc',
+                            fontFamily: 'serif',
+                            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+                        }}>
+                            <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #333', paddingBottom: '10px' }}>
+                                <h1 style={{ margin: 0, textTransform: 'uppercase', fontSize: '24px' }}>Greyhounds Telangana</h1>
+                                <p style={{ margin: '5px 0', fontSize: '18px' }}>Workshop Inventory Management System</p>
+                                <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>ISSUE REGISTER SLIP</h2>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px', fontSize: '16px' }}>
+                                <div>
+                                    <p><strong>Officer ID:</strong> {officerData.badgeNumber}</p>
+                                    <p><strong>Name:</strong> {officerData.name || 'N/A'}</p>
+                                    <p><strong>Unit:</strong> {officerData.department || 'N/A'}</p>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                                    <p><strong>Time:</strong> {new Date().toLocaleTimeString()}</p>
+                                    <p><strong>Purpose:</strong> {purpose || 'General Duty'}</p>
+                                </div>
+                            </div>
+
+                            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '40px', fontSize: '16px' }}>
+                                <thead>
+                                    <tr style={{ background: '#f1f1f1' }}>
+                                        <th style={{ border: '1px solid #333', padding: '10px', textAlign: 'left' }}>Item Description</th>
+                                        <th style={{ border: '1px solid #333', padding: '10px', textAlign: 'center', width: '100px' }}>Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {issuedSummary.map((item, i) => (
+                                        <tr key={i}>
+                                            <td style={{ border: '1px solid #333', padding: '10px' }}>{item.name}</td>
+                                            <td style={{ border: '1px solid #333', padding: '10px', textAlign: 'center' }}>{item.quantity}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', marginTop: '60px', textAlign: 'center' }}>
+                                <div>
+                                    <div style={{ width: '150px', borderTop: '1px solid #333', margin: 'auto' }}>Signature of Officer</div>
+                                </div>
+                                <div>
+                                    <div style={{ width: '150px', borderTop: '1px solid #333', margin: 'auto' }}>Issuing Authority</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                            <button className="btn" style={{ flex: 1, background: '#f1f5f9', color: '#475569' }} onClick={closeAfterPrint}>Done / Close</button>
+                            <button className="btn" style={{ flex: 1, background: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }} onClick={handlePrint}>
+                                <Printer size={20} /> Everything OK, Print Slip
+                            </button>
                         </div>
                     </div>
                 </div>

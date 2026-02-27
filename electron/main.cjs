@@ -45,6 +45,7 @@ async function createWindow() {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.cjs'),
+            plugins: true // Enable plugins for PDF/Print preview
         },
         autoHideMenuBar: true,
         show: false, // Don't show until ready
