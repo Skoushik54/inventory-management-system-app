@@ -311,6 +311,15 @@ app.post('/api/transactions/return/:id', auth, (req, res) => {
     res.json({ success: true, status: newStatus });
 });
 
+app.delete('/api/transactions/:id', auth, (req, res) => {
+    try {
+        db.prepare('DELETE FROM transactions WHERE id=?').run(req.params.id);
+        res.json({ success: true, message: 'Transaction record deleted' });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 app.delete('/api/transactions/clear-all', auth, (req, res) => {
     try {
         db.prepare('DELETE FROM transactions').run();

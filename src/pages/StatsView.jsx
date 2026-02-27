@@ -124,6 +124,17 @@ const StatsView = () => {
         }
     };
 
+    const handleDeleteTransaction = async (id) => {
+        if (!window.confirm("Delete this single transaction record?")) return;
+        try {
+            await api.delete(`/transactions/${id}`);
+            fetchStats();
+            showAlert('Success', 'Record deleted');
+        } catch (err) {
+            showAlert('Error', 'Failed to delete: ' + (err.response?.data?.error || err.message), 'error');
+        }
+    };
+
     const handleClearHistory = async () => {
         try {
             await api.delete('/transactions/clear-all');
@@ -233,6 +244,7 @@ const StatsView = () => {
                                 <th style={{ padding: '1rem' }}>Name of Equipment</th>
                                 <th style={{ padding: '1rem' }}>Date</th>
                                 <th style={{ padding: '1rem' }}>Status</th>
+                                <th style={{ padding: '1rem', textAlign: 'center' }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -263,6 +275,15 @@ const StatsView = () => {
                                             <span className={`badge badge-${t.eventType === 'ISSUED' ? 'warning' : (t.eventType === 'PARTIALLY_RETURNED' ? 'info' : 'success')}`}>
                                                 {t.eventType === 'PARTIALLY_RETURNED' ? 'PARTIAL' : t.eventType}
                                             </span>
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => handleDeleteTransaction(t.id)}
+                                                style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--danger)' }}
+                                                title="Delete record"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
