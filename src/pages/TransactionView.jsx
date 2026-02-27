@@ -162,14 +162,44 @@ const TransactionView = () => {
             }
         );
     };
+    const handleClearHistory = async () => {
+        showConfirm(
+            'Clear Entire History',
+            'Are you sure? This will PERMANENTLY delete all transaction logs from the system ledger. Inventory stock will not be affected.',
+            async () => {
+                try {
+                    await api.delete('/transactions/clear-all');
+                    fetchPending();
+                    showAlert('Success', 'Transaction history has been cleared permanently.');
+                    setConfirmPopup(prev => ({ ...prev, show: false }));
+                } catch (err) {
+                    showAlert('Error', 'Failed to clear history', 'error');
+                    setConfirmPopup(prev => ({ ...prev, show: false }));
+                }
+            },
+            'danger'
+        );
+    };
+
 
     const handlePrint = () => {
         const printContent = document.getElementById('print-receipt').innerHTML;
         const originalContent = document.body.innerHTML;
         document.body.innerHTML = printContent;
-        window.print();
-        document.body.innerHTML = originalContent;
-        window.location.reload();
+
+        // Use native Electron printing for better support
+        if (window.electronAPI && window.electronAPI.printReceipt) {
+            window.electronAPI.printReceipt();
+            // Revert UI after a small delay to allow print capture
+            setTimeout(() => {
+                document.body.innerHTML = originalContent;
+                window.location.reload();
+            }, 1000);
+        } else {
+            window.print();
+            document.body.innerHTML = originalContent;
+            window.location.reload();
+        }
     };
 
     const [returnQty, setReturnQty] = useState(1);
@@ -370,7 +400,26 @@ const TransactionView = () => {
             <div className="card" style={{ marginTop: '2rem', padding: 0, overflow: 'hidden' }}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3 style={{ margin: 0 }}>Active Issue Ledger</h3>
-                    <span className="badge badge-warning">{pending.length} Outstanding Items</span>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <button
+                            onClick={handleClearHistory}
+                            style={{
+                                padding: '0.4rem 0.8rem',
+                                background: 'none',
+                                border: '1px solid var(--danger)',
+                                color: 'var(--danger)',
+                                borderRadius: '0.4rem',
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.4rem'
+                            }}
+                        >
+                            <Trash2 size={14} /> Clear History
+                        </button>
+                        <span className="badge badge-warning">{pending.length} Outstanding Items</span>
+                    </div>
                 </div>
                 <div className="table-container">
                     <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>

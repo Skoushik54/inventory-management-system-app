@@ -306,9 +306,18 @@ app.post('/api/transactions/return/:id', auth, (req, res) => {
     const product = db.prepare('SELECT * FROM products WHERE id=?').get(t.productId);
     const newRet = t.returnedQuantity + qty;
     const newStatus = newRet >= t.quantity ? 'RETURNED' : 'PARTIALLY_RETURNED';
-    db.prepare('UPDATE products SET availableQuantity=? WHERE id=?').run(product.availableQuantity + qty, product.id);
-    db.prepare("UPDATE transactions SET returnedQuantity=?,returnedAt=datetime('now','localtime'),status=? WHERE id=?").run(newRet, newStatus, t.id);
-    res.json({ message: 'Return processed', status: newStatus });
+    db.prepare('UPDATE products SET availableQuantity=availableQuantity+? WHERE id=?').run(qty, t.productId);
+    db.prepare('UPDATE transactions SET returnedQuantity=?, status=?, returnedAt=CURRENT_TIMESTAMP WHERE id=?').run(newRet, newStatus, req.params.id);
+    res.json({ success: true, status: newStatus });
+});
+
+app.delete('/api/transactions/clear-all', auth, (req, res) => {
+    try {
+        db.prepare('DELETE FROM transactions').run();
+        res.json({ success: true, message: 'Transaction history cleared' });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 // ── Officers ──────────────────────────────────────────────────────────────────

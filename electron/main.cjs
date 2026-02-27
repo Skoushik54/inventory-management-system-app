@@ -80,14 +80,27 @@ app.whenReady().then(async () => {
 
         await createWindow();
 
-        // Handle Excel file picker from renderer
+        ipcMain.on('print-receipt', (event) => {
+            const win = BrowserWindow.getFocusedWindow();
+            if (win) {
+                win.webContents.print({
+                    silent: false, // Set to true for direct printing without a dialog
+                    printBackground: true,
+                    deviceName: ''
+                }, (success, failureReason) => {
+                    if (!success) console.log(failureReason);
+                    console.log('Print Finished');
+                });
+            }
+        });
+
         ipcMain.handle('pick-excel-file', async () => {
             const result = await dialog.showOpenDialog(mainWindow, {
                 title: 'Select your Excel Inventory File',
                 filters: [{ name: 'Excel Files', extensions: ['xlsx', 'xls'] }],
                 properties: ['openFile'],
             });
-            return result.canceled ? null : result.filePaths[0];
+            return result.filePaths.length > 0 ? result.filePaths[0] : null;
         });
 
         app.on('activate', () => {
