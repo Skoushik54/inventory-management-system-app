@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { UserPlus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
-
+import { UserPlus, Edit2, Trash2, Image as ImageIcon, Camera, X as XIcon, CheckCircle2 } from 'lucide-react';
+import PasswordPromptModal from '../components/PasswordPromptModal';
+import CameraCaptureModal from '../components/CameraCaptureModal';
 const OfficerView = () => {
     const [officers, setOfficers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [editingOfficer, setEditingOfficer] = useState(null);
     const [formData, setFormData] = useState({ name: '', badgeNumber: '', department: '', phone: '', image: null });
+    const [authPrompt, setAuthPrompt] = useState({ show: false, action: null });
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
 
     useEffect(() => {
         fetchOfficers();
@@ -36,14 +39,17 @@ const OfficerView = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this officer record?')) {
-            try {
-                await api.delete(`/officers/${id}`);
-                fetchOfficers();
-            } catch (err) {
-                alert('Error deleting officer');
+        setAuthPrompt({
+            show: true,
+            action: async () => {
+                try {
+                    await api.delete(`/officers/${id}`);
+                    fetchOfficers();
+                } catch (err) {
+                    alert('Error deleting officer');
+                }
             }
-        }
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -141,24 +147,56 @@ const OfficerView = () => {
                         <h3>{editingOfficer ? 'Update Officer Record' : 'Register New Officer'}</h3>
                         <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
                             <div className="form-group">
-                                <label>Full Name</label>
+                                <label>Full Name <span style={{ color: 'var(--danger)' }}>*</span></label>
                                 <input className="form-input" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                             </div>
                             <div className="form-group">
-                                <label>Badge Number / ID Reference</label>
+                                <label>Badge Number / ID Reference <span style={{ color: 'var(--danger)' }}>*</span></label>
                                 <input className="form-input" value={formData.badgeNumber} onChange={e => setFormData({ ...formData, badgeNumber: e.target.value })} required />
                             </div>
                             <div className="form-group">
-                                <label>Department / Unit</label>
+                                <label>Department / Unit <span style={{ color: 'var(--danger)' }}>*</span></label>
                                 <input className="form-input" value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })} required />
                             </div>
                             <div className="form-group">
-                                <label>Phone Contact</label>
+                                <label>Phone Contact <span style={{ color: 'var(--danger)' }}>*</span></label>
                                 <input className="form-input" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} required />
                             </div>
                             <div className="form-group">
                                 <label>ID Card / Barcode Image</label>
-                                <input type="file" className="form-input" onChange={e => setFormData({ ...formData, image: e.target.files[0] })} />
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    <input 
+                                        type="file" 
+                                        id="officer-img-upload" 
+                                        style={{ display: 'none' }} 
+                                        onChange={e => setFormData({ ...formData, image: e.target.files[0] })} 
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className="btn" 
+                                        style={{ background: '#f1f5f9', color: '#475569', padding: '0.5rem 1rem', width: 'auto', fontSize: '0.85rem' }}
+                                        onClick={() => document.getElementById('officer-img-upload').click()}
+                                    >
+                                        Upload File
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        className="btn" 
+                                        style={{ background: 'var(--accent)', color: 'white', padding: '0.5rem 1rem', width: 'auto', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                        onClick={() => setIsCameraOpen(true)}
+                                    >
+                                        <Camera size={16} /> Take Photo
+                                    </button>
+                                </div>
+                                {formData.image && (
+                                    <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: '#f0fdf4', borderRadius: '0.5rem', border: '1px solid #bbf7d0' }}>
+                                        <CheckCircle2 size={16} color="var(--success)" />
+                                        <span style={{ fontSize: '0.85rem', color: '#166534' }}>Photo Ready: {formData.image.name || "Captured Image"}</span>
+                                        <button type="button" onClick={() => setFormData({ ...formData, image: null })} style={{ border: 'none', background: 'none', cursor: 'pointer', marginLeft: 'auto' }}>
+                                            <XIcon size={16} />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
                                 <button type="button" className="btn" style={{ backgroundColor: 'var(--text-muted)' }} onClick={() => setShowModal(false)}>Cancel</button>
@@ -168,6 +206,23 @@ const OfficerView = () => {
                     </div>
                 </div>
             )}
+
+            <PasswordPromptModal
+                isOpen={authPrompt.show}
+                onClose={() => setAuthPrompt({ show: false, action: null })}
+                onConfirm={() => {
+                    if (authPrompt.action) authPrompt.action();
+                    setAuthPrompt({ show: false, action: null });
+                }}
+                title="Verify Action"
+                message="Please enter the admin password to delete this officer."
+            />
+            <CameraCaptureModal 
+                isOpen={isCameraOpen} 
+                onClose={() => setIsCameraOpen(false)} 
+                onCapture={(file) => setFormData({ ...formData, image: file })}
+                title="Capture Officer Photo"
+            />
         </div>
     );
 };

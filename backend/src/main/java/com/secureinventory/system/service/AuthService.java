@@ -65,4 +65,13 @@ public class AuthService {
         }
         adminRepository.save(admin);
     }
+
+    public boolean verifyPassword(String username, String password) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -30,6 +30,11 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.getProductByBarcode(barcode));
     }
 
+    @GetMapping("/products/id/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(inventoryService.getProductById(id));
+    }
+
     @PutMapping("/products/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
         return ResponseEntity.ok(inventoryService.updateProduct(id, product));
@@ -41,26 +46,71 @@ public class InventoryController {
         return ResponseEntity.ok().build();
     }
 
-    private static final String EXCEL_PATH = "C:/Users/samba/Downloads/inventory-management-system-main/inventory-management-system-main/COM EQP 25-02-2026.xlsx";
+    @GetMapping("/items/{barcode}")
+    public ResponseEntity<com.secureinventory.system.entity.ProductItem> getItem(@PathVariable String barcode) {
+        return ResponseEntity.ok(inventoryService.getItemByBarcode(barcode));
+    }
+
+    @PostMapping("/products/{id}/items")
+    public ResponseEntity<Void> addItems(@PathVariable Long id, @RequestBody java.util.List<java.util.Map<String, String>> itemData) {
+        inventoryService.addItemsToProduct(id, itemData);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/products/{id}/spare-parts")
+    public ResponseEntity<Void> addSparePart(@PathVariable Long id, @RequestBody java.util.Map<String, String> payload) {
+        inventoryService.addSparePartToProduct(id, payload.get("name"));
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/items/{id}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
+        inventoryService.deleteProductItem(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/items/{id}")
+    public ResponseEntity<com.secureinventory.system.entity.ProductItem> updateItem(@PathVariable Long id, @RequestBody com.secureinventory.system.entity.ProductItem details) {
+        return ResponseEntity.ok(inventoryService.updateProductItem(id, details));
+    }
+
+    @DeleteMapping("/spare-parts/{id}")
+    public ResponseEntity<Void> deleteSparePart(@PathVariable Long id) {
+        inventoryService.deleteSparePart(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/set-excel-path")
+    public ResponseEntity<Void> setExcelPath(@RequestBody java.util.Map<String, String> payload) {
+        String path = payload.get("path");
+        if (path != null) {
+            inventoryService.setExcelPath(path);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
 
     @GetMapping("/open-local")
-    public ResponseEntity<Void> openLocalExcel() {
-        inventoryService.openLocalExcel(EXCEL_PATH);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<java.util.Map<String, String>> openLocalExcel() {
+        String currentPath = inventoryService.getExcelPath();
+        inventoryService.openLocalExcel(currentPath);
+        java.util.Map<String, String> response = new java.util.HashMap<>();
+        response.put("message", "Attempting to open: " + currentPath);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/sync")
     public ResponseEntity<Void> syncFromExcel() {
-        inventoryService.syncFromExcel(EXCEL_PATH);
+        inventoryService.syncFromExcel(inventoryService.getExcelPath());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/upload-sync")
     public ResponseEntity<String> uploadAndSync(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         try {
-            java.io.File dest = new java.io.File(EXCEL_PATH);
+            java.io.File dest = new java.io.File(inventoryService.getExcelPath());
             file.transferTo(dest);
-            inventoryService.syncFromExcel(EXCEL_PATH);
+            inventoryService.syncFromExcel(inventoryService.getExcelPath());
             return ResponseEntity.ok("Successfully uploaded and synced.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to upload: " + e.getMessage());
@@ -72,7 +122,7 @@ public class InventoryController {
         String link = payload.get("cloudLink");
         if (link == null || link.isEmpty()) return ResponseEntity.badRequest().body("Link is missing");
         try {
-            inventoryService.syncFromCloudLink(link, EXCEL_PATH);
+            inventoryService.syncFromCloudLink(link, inventoryService.getExcelPath());
             return ResponseEntity.ok("Cloud Sync Successful!");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Cloud Sync Failed: " + e.getMessage());
@@ -82,7 +132,7 @@ public class InventoryController {
     @GetMapping("/download-excel")
     public ResponseEntity<org.springframework.core.io.Resource> downloadExcel() {
         try {
-            java.nio.file.Path path = java.nio.file.Paths.get("C:/Users/samba/Downloads/inventory-management-system-main/inventory-management-system-main/COM EQP 25-02-2026.xlsx");
+            java.nio.file.Path path = java.nio.file.Paths.get(inventoryService.getExcelPath());
             org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(path.toUri());
             return ResponseEntity.ok()
                     .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")

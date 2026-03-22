@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByStatus(Transaction.Status status);
+    long countByStatus(Transaction.Status status);
+    void deleteByProductItemProductId(Long productId);
 }

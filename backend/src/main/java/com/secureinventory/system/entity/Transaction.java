@@ -1,5 +1,6 @@
 package com.secureinventory.system.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -11,8 +12,18 @@ public class Transaction {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(name = "product_item_id")
+    @JsonIgnoreProperties("product")
+    private ProductItem productItem;
+
+    @Column
+    private String batchId;
+
+    @Column
+    private String issuerName;
+
+    @Column
+    private String extraAccessories;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "officer_id")
@@ -36,6 +47,15 @@ public class Transaction {
     @Column(nullable = false)
     private Status status = Status.ISSUED;
 
+    @Column
+    private boolean isDamaged = false;
+
+    @Column
+    private String damagePhotoUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String missingSpares;
+
     public enum Status {
         ISSUED, RETURNED, PARTIALLY_RETURNED
     }
@@ -48,12 +68,36 @@ public class Transaction {
         this.id = id;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductItem getProductItem() {
+        return productItem;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductItem(ProductItem productItem) {
+        this.productItem = productItem;
+    }
+
+    public String getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(String batchId) {
+        this.batchId = batchId;
+    }
+
+    public String getIssuerName() {
+        return issuerName;
+    }
+
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
+    }
+
+    public String getExtraAccessories() {
+        return extraAccessories;
+    }
+
+    public void setExtraAccessories(String extraAccessories) {
+        this.extraAccessories = extraAccessories;
     }
 
     public Officer getOfficer() {
@@ -62,10 +106,6 @@ public class Transaction {
 
     public void setOfficer(Officer officer) {
         this.officer = officer;
-    }
-
-    public int getQuantity() {
-        return quantity;
     }
 
     public void setQuantity(int quantity) {
@@ -110,5 +150,29 @@ public class Transaction {
 
     public void setReturnedQuantity(int returnedQuantity) {
         this.returnedQuantity = returnedQuantity;
+    }
+
+    public boolean isDamaged() {
+        return isDamaged;
+    }
+
+    public void setDamaged(boolean damaged) {
+        isDamaged = damaged;
+    }
+
+    public String getDamagePhotoUrl() {
+        return damagePhotoUrl;
+    }
+
+    public void setDamagePhotoUrl(String damagePhotoUrl) {
+        this.damagePhotoUrl = damagePhotoUrl;
+    }
+
+    public String getMissingSpares() {
+        return missingSpares;
+    }
+
+    public void setMissingSpares(String missingSpares) {
+        this.missingSpares = missingSpares;
     }
 }

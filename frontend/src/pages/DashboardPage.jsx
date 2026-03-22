@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import InventoryView from './InventoryView';
+import ProductItemDetail from './ProductItemDetail';
 import TransactionView from './TransactionView';
 import StatsView from './StatsView';
-import InventorySpreadsheet from './InventorySpreadsheet';
+import AdminSettingsView from './AdminSettingsView';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 const DashboardPage = () => {
@@ -26,8 +27,9 @@ const DashboardPage = () => {
                 <Routes>
                     <Route path="/" element={<StatsView />} />
                     <Route path="/inventory" element={<InventoryView />} />
+                    <Route path="/inventory/:productId" element={<ProductItemDetail />} />
                     <Route path="/transactions" element={<TransactionView />} />
-                    <Route path="/spreadsheet" element={<InventorySpreadsheet />} />
+                    <Route path="/admin" element={<AdminSettingsView />} />
                 </Routes>
             </main>
 

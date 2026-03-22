@@ -24,3 +24,12 @@ frontend/*.log
 .vscode/
 *.swp
 *.swo
+
+# Data and Uploads
+GreyhoundsInventory/
+*.db
+*.sqlite
+**/transaction_history/
+**/images/
+**/persons/
+**/damaged/

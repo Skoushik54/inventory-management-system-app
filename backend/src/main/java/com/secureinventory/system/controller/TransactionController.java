@@ -17,13 +17,24 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @PostMapping("/issue")
-    public ResponseEntity<Transaction> issueProduct(@RequestBody InventoryDtos.IssueRequest request) {
-        return ResponseEntity.ok(transactionService.issueProduct(request));
+    public ResponseEntity<List<Transaction>> issueBatch(@RequestBody InventoryDtos.IssueRequest request) {
+        return ResponseEntity.ok(transactionService.issueBatch(request));
     }
 
     @PostMapping("/return/{id}")
-    public ResponseEntity<Void> returnProduct(@PathVariable Long id, @RequestParam(defaultValue = "1") int quantity) {
-        transactionService.returnProduct(id, quantity);
+    public ResponseEntity<Void> returnProduct(
+            @PathVariable Long id, 
+            @RequestParam(defaultValue = "1") int quantity,
+            @RequestParam(required = false) Transaction.Status status) {
+        transactionService.returnProduct(id, quantity, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/return-detailed/{id}")
+    public ResponseEntity<Void> returnProductDetailed(
+            @PathVariable Long id,
+            @RequestBody com.secureinventory.system.dto.InventoryDtos.DetailedReturnRequest request) {
+        transactionService.returnProductDetailed(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -35,5 +46,16 @@ public class TransactionController {
     @GetMapping("/all")
     public ResponseEntity<List<Transaction>> getAll() {
         return ResponseEntity.ok(transactionService.getAllTransactions());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Transaction>> getRoot() {
+        return ResponseEntity.ok(transactionService.getAllTransactions());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
+        transactionService.deleteTransaction(id);
+        return ResponseEntity.ok().build();
     }
 }

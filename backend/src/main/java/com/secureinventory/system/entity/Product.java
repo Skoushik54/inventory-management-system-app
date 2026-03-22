@@ -1,9 +1,12 @@
 package com.secureinventory.system.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,6 +38,14 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.ACTIVE;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("product")
+    private List<ProductItem> items = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("product")
+    private List<SparePart> spareParts = new ArrayList<>();
 
     @CreatedDate
     @Column(updatable = false)
@@ -114,5 +125,21 @@ public class Product {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<ProductItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ProductItem> items) {
+        this.items = items;
+    }
+
+    public List<SparePart> getSpareParts() {
+        return spareParts;
+    }
+
+    public void setSpareParts(List<SparePart> spareParts) {
+        this.spareParts = spareParts;
     }
 }

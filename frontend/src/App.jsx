@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 
@@ -7,7 +7,6 @@ const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem('token');
     return token ? children : <Navigate to="/login" />;
 };
-
 function App() {
     return (
         <Router>
@@ -21,7 +20,9 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-                <Route path="/" element={<Navigate to="/dashboard" />} />
+                <Route path="/inventory" element={<Navigate to="/dashboard/inventory" />} />
+                <Route path="/transactions" element={<Navigate to="/dashboard/transactions" />} />
+                <Route path="/" element={<Navigate to="/login" />} />
             </Routes>
         </Router>
     );

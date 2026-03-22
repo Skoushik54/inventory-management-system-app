@@ -1,6 +1,7 @@
 package com.secureinventory.system.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class InventoryDtos {
 
@@ -77,17 +78,18 @@ public class InventoryDtos {
     }
 
     public static class IssueRequest {
-        private String barcode;
+        private List<String> barcodes; // Changed from single barcode to list of item barcodes
         private String badgeNumber;
         private String name;
         private String department;
         private String phone;
         private String others;
-        private int quantity;
         private String purpose;
+        private String issuerName;
+        private String extraAccessories;
 
-        public String getBarcode() { return barcode; }
-        public void setBarcode(String barcode) { this.barcode = barcode; }
+        public List<String> getBarcodes() { return barcodes; }
+        public void setBarcodes(List<String> barcodes) { this.barcodes = barcodes; }
         public String getBadgeNumber() { return badgeNumber; }
         public void setBadgeNumber(String badgeNumber) { this.badgeNumber = badgeNumber; }
         public String getName() { return name; }
@@ -98,10 +100,12 @@ public class InventoryDtos {
         public void setPhone(String phone) { this.phone = phone; }
         public String getOthers() { return others; }
         public void setOthers(String others) { this.others = others; }
-        public int getQuantity() { return quantity; }
-        public void setQuantity(int quantity) { this.quantity = quantity; }
         public String getPurpose() { return purpose; }
         public void setPurpose(String purpose) { this.purpose = purpose; }
+        public String getIssuerName() { return issuerName; }
+        public void setIssuerName(String issuerName) { this.issuerName = issuerName; }
+        public String getExtraAccessories() { return extraAccessories; }
+        public void setExtraAccessories(String extraAccessories) { this.extraAccessories = extraAccessories; }
     }
 
     public static class ReturnRequest {
@@ -123,6 +127,20 @@ public class InventoryDtos {
         public void setBadgeNumber(String badgeNumber) {
             this.badgeNumber = badgeNumber;
         }
+    }
+
+    public static class DetailedReturnRequest {
+        @com.fasterxml.jackson.annotation.JsonProperty("isDamaged")
+        private boolean isDamaged;
+        private String damagePhotoUrl;
+        private String missingSpares;
+
+        public boolean isDamaged() { return isDamaged; }
+        public void setDamaged(boolean damaged) { isDamaged = damaged; }
+        public String getDamagePhotoUrl() { return damagePhotoUrl; }
+        public void setDamagePhotoUrl(String damagePhotoUrl) { this.damagePhotoUrl = damagePhotoUrl; }
+        public String getMissingSpares() { return missingSpares; }
+        public void setMissingSpares(String missingSpares) { this.missingSpares = missingSpares; }
     }
 
     public static class OfficerRequest {
@@ -162,5 +180,24 @@ public class InventoryDtos {
         public void setPhone(String phone) {
             this.phone = phone;
         }
+    }
+
+    public static class SummaryResponse {
+        private long totalProducts;
+        private long availableStock;
+        private long issuedItems;
+        private long pendingReturns;
+        private long damagedItems;
+
+        public long getTotalProducts() { return totalProducts; }
+        public void setTotalProducts(long totalProducts) { this.totalProducts = totalProducts; }
+        public long getAvailableStock() { return availableStock; }
+        public void setAvailableStock(long availableStock) { this.availableStock = availableStock; }
+        public long getIssuedItems() { return issuedItems; }
+        public void setIssuedItems(long issuedItems) { this.issuedItems = issuedItems; }
+        public long getPendingReturns() { return pendingReturns; }
+        public void setPendingReturns(long pendingReturns) { this.pendingReturns = pendingReturns; }
+        public long getDamagedItems() { return damagedItems; }
+        public void setDamagedItems(long damagedItems) { this.damagedItems = damagedItems; }
     }
 }
